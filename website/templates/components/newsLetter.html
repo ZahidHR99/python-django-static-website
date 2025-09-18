@@ -1,0 +1,26 @@
+{% load static %}
+
+<section class="py-5  my-5 bg-success">
+        <div class="container">
+          <div class="row align-items-center justify-content-center">
+            <div class="col-12 wow fadeIn col-md-10 col-lg-6 mb-4 mb-lg-0">
+              <div class="pe-lg-5">
+                <span class="text-white">Stay Updated</span>
+                <h2 class="display-4 fw-bold mt-2 mb-3 text-white">Get the Latest Updates Delivered to You</h2>
+                <p class="text-white">Subscribe to our newsletter to receive the latest news, updates, and valuable resources directly to your inbox. Stay ahead with insights and trends.</p>
+              </div>
+            </div>
+            <div class="col-12 wow fadeIn col-md-10 col-lg-5 offset-lg-1">
+              <div class="mx-auto text-center p-5 bg-light rounded">
+                <h4 class="fw-bold">Sign up to our newsletter</h4>
+                <p class="text-muted mb-4">Be the first to know about new projects, updates, and exclusive content.</p>
+                <form action="#">
+                  {% csrf_token %}
+                  <input class="form-control form-control-lg mb-3" type="email" placeholder="Type your e-mail">
+                  <button class="btn btn-success btn-lg w-100">Action</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+</section>
