@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, Http404, HttpResponseRedirect, HttpResponseNotFound
+import os
+from config import settings
 
 # home page
 def home(request):
@@ -138,3 +140,37 @@ def demo9(request):
     response.set_cookie('session_id', 'abcdef', secure=True)
     return response
 
+# file download response
+def download(request):
+    # code to handle file download
+    # file path
+    file_path = os.path.join(settings.BASE_DIR, 'uploads/bill.pdf')
+
+    # file name
+    # The `file_name` variable in the `download` function is storing the base name of the file path.
+    # It is extracted using the `os.path.basename()` function, which returns the last component of the
+    # path. In this case, it is used to set the filename for the downloaded file in the response
+    # headers.
+    file_name = os.path.basename(file_path)
+
+    # check if file exists
+    if os.path.exists(file_path):
+        # open the file in binary mode
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/octet-stream")
+            response['Content-Disposition'] = 'attachment; filename=' + file_name
+            return response 
+
+# file binary rsponse
+def binary_response(request):
+    # code to handle file download
+    # file path
+    file_path = os.path.join(settings.BASE_DIR, 'uploads/bill.pdf')
+
+    # check if file exists
+    if os.path.exists(file_path):
+        # open the file in binary mode
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/pdf")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+            return response

@@ -19,4 +19,6 @@ urlpatterns = [
     path('api/demo7/', views.demo7, name='demo7'), 
     path('api/demo8/', views.demo8, name='demo8'), 
     path('api/demo9/', views.demo9, name='demo9'), 
+    path('api/download/', views.download, name='download'), 
+    path('api/binary_response/', views.binary_response, name='binary_response'), 
 ]
