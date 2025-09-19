@@ -19,6 +19,13 @@ urlpatterns = [
     path('api/demo7/', views.demo7, name='demo7'), 
     path('api/demo8/', views.demo8, name='demo8'), 
     path('api/demo9/', views.demo9, name='demo9'), 
+    path('api/demo10/', views.demo10, name='demo10'), 
+    path('api/demo11/', views.demo11, name='demo11'), 
+    path('api/demo12/', views.demo12, name='demo12'), 
+    path('api/demo13/', views.demo13, name='demo13'), 
+    path('api/demo14/', views.demo14, name='demo14'), 
+    path('api/demo15/', views.demo15, name='demo15'), 
+    path('api/demo16/', views.demo16, name='demo16'), 
     path('api/download/', views.download, name='download'), 
     path('api/binary_response/', views.binary_response, name='binary_response'), 
 ]

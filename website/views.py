@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, Http404, HttpResponseRedirect, HttpResponseNotFound
 import os
 from config import settings
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 # home page
 def home(request):
@@ -174,3 +176,145 @@ def binary_response(request):
             response = HttpResponse(fh.read(), content_type="application/pdf")
             response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
             return response
+
+# Method GET, POST, PUT, DELETE, PATCH
+@csrf_exempt
+def demo10(request):
+    if request.method == 'GET':
+        return HttpResponse('This is a GET request')
+    elif request.method == 'POST':
+        return HttpResponse('This is a POST request')
+    elif request.method == 'PUT':
+        return HttpResponse('This is a PUT request')
+    elif request.method == 'DELETE':
+        return HttpResponse('This is a DELETE request')
+    elif request.method == 'PATCH':
+        return HttpResponse('This is a PATCH request')
+    else:
+        return HttpResponse('This is a unknown request')
+    
+# Method with URL Query Parameters
+def demo11(request):
+    name = request.GET.get('name', 'Guest')
+    age = request.GET.get('age', '0')
+    address = request.GET.get('address', 'Unknown')
+    mobile = request.GET.get('mobile', '0000000000')
+
+    return HttpResponse(f'Hello {name}, you are {age} years old. You live in {address}. Your mobile number is {mobile}.', status=200)
+
+# Method with request header
+def demo12(request):
+    token1 = request.headers.get('token1', 'Not Provided')
+    token2 = request.headers.get('token2', 'Not Provided')
+    token3 = request.headers.get('token3', 'Not Provided')
+
+    return HttpResponse(f'Token1: {token1}, Token2: {token2}, Token3: {token3}', status=200)
+
+# Method with request body  JSON
+@csrf_exempt
+def demo13(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return HttpResponse('Invalid JSON', status=400)
+        return JsonResponse(data, status=200)
+    else:
+        return JsonResponse('This is a GET request', status=200)
+    
+
+# Method with request body Form Data
+@csrf_exempt
+def demo14(request):
+    if request.method == 'POST':
+        data = request.POST.dict()
+        return JsonResponse(data, status=200)
+    
+       # name    = request.POST.get('name', 'Guest')
+       # age     = request.POST.get('age', '0')
+       # address = request.POST.get('address', 'Unknown')
+       # mobile  = request.POST.get('mobile', '0000000000')
+
+       # return HttpResponse(f'Hello {name}, you are {age} years old. You live in {address}. Your mobile number is {mobile}.', status=200)
+    else:
+        return HttpResponse('This is a GET request', status=200)
+    
+# Multipart Form Data (File Upload)
+@csrf_exempt
+def demo15(request):
+    if request.method == 'POST':
+        if 'file' in request.FILES:
+            file = request.FILES['file']
+            file_name = file.name
+            file_size = file.size
+            file_type = file.content_type
+
+            save_path = os.path.join(settings.BASE_DIR, 'uploads', file.name)
+            with open(save_path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+
+            return HttpResponse(f'File Uploaded SUccessfully! File Name: {file_name}, File Size: {file_size} bytes, File Type: {file_type}', status=200)
+        else:
+            return HttpResponse('No file uploaded', status=400) 
+    else:
+        return HttpResponse('This is a GET request', status=200)
+    
+# Catch Request Cookies
+def demo16(request):
+    Cookie_1 = request.COOKIES.get('Cookie_1', 'Not Provided')
+    Cookie_2 = request.COOKIES.get('Cookie_2', 'Not Provided')
+    Cookie_3 = request.COOKIES.get('Cookie_3', 'Not Provided')
+
+    return HttpResponse(f'Cookie 1: {Cookie_1}, Cookie 2: {Cookie_2}, Cookie 3: {Cookie_3}', status=200)
+
+# Combination of all
+@csrf_exempt
+def all_demo(request):
+    if request.method == 'POST':
+        # URL Query Parameters
+        name = request.GET.get('name', 'Guest')
+        age = request.GET.get('age', '0')
+
+        # Request Headers
+        token1 = request.headers.get('token1', 'Not Provided')
+
+        # Request Body JSON
+        try:
+            body_data = json.loads(request.body)
+        except json.JSONDecodeError:
+            body_data = {}
+
+        # Form Data
+        form_data = request.POST.dict()
+
+        # File Upload
+        file_info = {}
+        if 'file' in request.FILES:
+            file = request.FILES['file']
+            file_info = {
+                'file_name': file.name,
+                'file_size': file.size,
+                'file_type': file.content_type
+            }
+            save_path = os.path.join(settings.BASE_DIR, 'uploads', file.name)
+            with open(save_path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+
+        response_data = {
+            'query_params': {
+                'name': name,
+                'age': age
+            },
+            'headers': {
+                'token1': token1
+            },
+            'body_json': body_data,
+            'form_data': form_data,
+            'file_info': file_info
+        }
+
+        return JsonResponse(response_data, status=200)
+    else:
+        return HttpResponse('This is a GET request', status=200)
