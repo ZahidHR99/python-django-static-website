@@ -4,10 +4,154 @@ import os
 from config import settings
 from django.views.decorators.csrf import csrf_exempt
 import json
-
+from .models import OTP, Category, Product, Customer, Invoice, InvoiceProduct
+from django.db.models import Q, F, Sum, Count, Avg, Max, Min, Exists, OuterRef, Subquery, When, Case, Value, CharField, DateField, DateTimeField
+from django.core.serializers import serialize
+ 
 # home page
 def home(request):
-    return render(request, 'home.html')
+    # Equal
+    res1 = Product.objects.filter(price=100).values()
+    # Not Equal
+    res2 = Product.objects.exclude(price=100).values()
+    # Greater Than
+    res3 = Product.objects.filter(price__gt=100).values()
+    # Less Than
+    res4 = Product.objects.filter(price__lt=100).values()
+    # Greater Than or Equal
+    res5 = Product.objects.filter(price__gte=100).values()
+    # Less Than or Equal
+    res6 = Product.objects.filter(price__lte=100).values()
+    # In
+    res7 = Product.objects.filter(price__in=[50, 100, 150]).values()
+    # Between
+    res8 = Product.objects.filter(price__range=[50, 150]).values()
+    # Is Null
+    res9 = Product.objects.filter(img_url__isnull=True).values()
+    # Is Not Null
+    res10 = Product.objects.filter(img_url__isnull=False).values()
+    # Like
+    res11 = Product.objects.filter(name__icontains='phone').values()
+    # Starts With
+    res12 = Product.objects.filter(name__istartswith='S').values()
+    # Ends With
+    res13 = Product.objects.filter(name__iendswith='e').values()
+    # AND
+    res14 = Product.objects.filter(price__gt=100, stock__lt=50).values()
+    # OR
+    res15 = Product.objects.filter(Q(price__gt=100) | Q(stock__lt=50)).values()
+    # F Expressions
+    res16 = Product.objects.filter(stock__lt=F('price')).values()
+    # Exists
+    subquery = Category.objects.filter(id=OuterRef('category_id'), name__icontains='Electronics')       
+    res17 = Product.objects.annotate(category_exists=Exists(subquery)).filter(category_exists=True).values()
+    # Subquery
+    subquery = Category.objects.filter(name__icontains='Electronics').values('id')
+    res18 = Product.objects.filter(category_id__in=Subquery(subquery)).values()
+
+    # Conditional Expressions
+   #
+    return JsonResponse({
+        'res1': list(res1),
+        'res2': list(res2),
+        'res3': list(res3),
+        'res4': list(res4),
+        'res5': list(res5),
+        'res6': list(res6),
+        'res7': list(res7),
+        'res8': list(res8),
+        'res9': list(res9), 
+        'res10': list(res10),
+        'res11': list(res11),
+        'res12': list(res12),
+        'res13': list(res13),
+        'res14': list(res14),
+        'res15': list(res15),
+        'res16': list(res16),
+        'res17': list(res17),
+        'res18': list(res18),
+    
+    }, status=200)
+                                                                              
+
+    #aggregation = Customer.objects.aggregate(total_customers=Count('id'), avg_id=Avg('id'), max_id=Max('id'), min_id=Min('id'), sum_id=Sum('id'))
+    #return JsonResponse(aggregation, status=200)
+    # return render(request, 'home.html')
+    # Fetch all customers from the database
+    """
+    customers = Customer.objects.all()
+    result = serialize('json', customers, fields=('id', 'name', 'email', 'phone', 'address'))
+    return JsonResponse({'data': json.loads(result)}, status=200)
+    """
+
+    # Fetch single customer from the database
+    """
+    customer = Customer.objects.get(id=1)
+    customer_data = {
+        'id': customer.id,
+        'name': customer.name,
+        'email': customer.email,
+        'phone': customer.phone,
+        'address': customer.address
+    }   
+    return JsonResponse(customer_data, status=200)
+    """
+
+    # Fetch first customer from the database
+    """
+    customer = Customer.objects.first() # objects.last()
+    customer_data = {
+        'id': customer.id,
+        'name': customer.name,
+        'email': customer.email,
+        'phone': customer.phone,
+        'address': customer.address
+    }
+    return JsonResponse(customer_data, status=200)
+    """
+
+    # Fetch customers with filter from the database
+    # name__incontains, name__startswith, name__endswith
+    # name__contains=case-sensitive 
+    # name__icontains=case-insensitive
+    # customers = Customer.objects.filter(name__icontains='John')
+    # customers = Customer.exclude(name__icontains='John')
+    # customers = Customer.objects.all().order_by('-id')  #  .order_by('id')
+    # customers = Customer.objects.all().order_by('name') # ASC name
+    # customers = Customer.objects.all().order_by('-name') # DESC name
+    # customers = Customer.objects.all()[0:5] # slicing limiting
+    # customers = Customer.objects.all()[::-1] # reversing
+    # customers = Customer.objects.count() # total count
+    # customers = Customer.objects.values('name').distinct() # distinct values only
+    # return JsonResponse({'data':list(customers)}, status=200)
+ 
+    # Value list queryset
+    """
+    customers = Customer.objects.values_list('name', 'email') # flat=True for single field
+    return JsonResponse({'data':list(customers)}, status=200)
+    """
+
+    # Query set chaining
+    """
+    customers = Customer.objects.filter(name__icontains='Zahid Hasan').order_by('-id')[0:5]
+    result = serialize('json', customers, fields=('id', 'name', 'email', 'phone', 'address'))
+    return JsonResponse({'data': json.loads(result)}, status=200)#
+    """
+
+    # Raw SQL Query
+    """
+    customers = Customer.objects.raw('SELECT * FROM website_customer WHERE name LIKE %s', ['%Ali Khan%'])
+    result = serialize('json', customers, fields=('id', 'name', 'email', 'phone', 'address'))
+    return JsonResponse({'data': json.loads(result)}, status=200)
+    """
+
+    """
+    customers = Customer.objects.all().values('id', 'name', 'email', 'phone', 'address')
+    query = str(customers.query)
+    return JsonResponse({'data': list(customers), 'query': query}, status=200)
+    """
+
+    
 
 # about page
 def about(request):
