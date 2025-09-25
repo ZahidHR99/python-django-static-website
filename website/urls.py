@@ -28,4 +28,5 @@ urlpatterns = [
     path('api/demo16/', views.demo16, name='demo16'), 
     path('api/download/', views.download, name='download'), 
     path('api/binary_response/', views.binary_response, name='binary_response'), 
+    path('orm', views.practice_orm, name='practice_orm'),
 ]

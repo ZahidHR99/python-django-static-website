@@ -7,10 +7,190 @@ import json
 from .models import OTP, Category, Product, Customer, Invoice, InvoiceProduct
 from django.db.models import Q, F, Sum, Count, Avg, Max, Min, Exists, OuterRef, Subquery, When, Case, Value, CharField, DateField, DateTimeField
 from django.core.serializers import serialize
- 
+
 # home page
 def home(request):
-    # Equal
+    #return render(request, 'home.html')
+  
+    Product.objects.create(
+        name='Samsung Galaxy S23',
+        description='Latest Samsung flagship smartphone with cutting-edge features.',
+        price=999.99,
+        unit='pcs',
+        img_url='https://example.com/samsung-galaxy-s23.jpg',
+        stock=100,
+        category_id=1,
+        user_id=1   
+    )
+    return JsonResponse({'message': 'Home Page'}, status=200)
+   
+
+"""
+    # Insert Multiple Records
+    products = [
+        Product(
+            name='Apple iPhone 14', 
+            description='Latest Apple flagship smartphone with advanced features.',
+            price=1099.99,
+            unit='pcs',
+            img_url='https://example.com/iphone-14.jpg',
+            stock=50,
+            category_id=1,
+            user_id=1
+        ),
+        Product(
+            name='Dell XPS 13',
+            description='High-performance laptop with sleek design and powerful features.',
+            price=1299.99,
+            unit='pcs',
+            img_url='https://example.com/dell-xps-13.jpg',
+            stock=20,
+            category_id=1,
+            user_id=1
+        ),
+        Product(
+            name='Sony PlayStation 5',
+            description='Next-generation gaming console with immersive gaming experience.',
+            price=499.99,
+            unit='pcs',
+            img_url='https://example.com/playstation-5.jpg',
+            stock=30,
+            category_id=1,
+            user_id=1
+        )
+    ]
+
+    # Add more products as needed
+    Product.objects.bulk_create(products)
+    return JsonResponse({'message': 'All Product inserted successfully'}, status=200)
+"""
+
+# Product Insert & Delete Operations
+@csrf_exempt
+def product_add(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            name        = data.get('name')
+            description = data.get('description', '')
+            price       = data.get('price', 0)
+            unit        = data.get('unit', 'pcs')
+            img_url     = data.get('img_url', '')
+            stock       = data.get('stock', 0)
+            category_id = data.get('category_id')
+            user_id     = data.get('user_id')
+            user_id     = data.get('user_id')
+            user_id     = data.get('user_id')
+            if not all([name, category_id, user_id]):
+                return JsonResponse({'error': 'Name, Category ID, and User ID are required.'}, status=400)
+            category = Category.objects.get(id=category_id)
+            product = Product.objects.create(name=name, description=description, price=price, unit=unit, img_url=img_url, stock=stock, category=category, user_id=user_id)
+            return JsonResponse({'message': 'Product added successfully', 'product_id': product.id}, status=201)
+        except Category.DoesNotExist:
+            return JsonResponse({'error': 'Category not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+def product_edit(request, id):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            product = Product.objects.get(id=id)
+            product.name        = data.get('name', product.name)
+            product.description = data.get('description', product.description)
+            product.price       = data.get('price', product.price)
+            product.unit        = data.get('unit', product.unit)
+            product.img_url     = data.get('img_url', product.img_url)  
+            product.stock       = data.get('stock', product.stock)
+            category_id         = data.get('category_id')
+            if category_id:
+                category = Category.objects.get(id=category_id)
+                product.category = category
+            product.save()
+            return JsonResponse({'message': 'Product updated successfully'}, status=200)
+        except Product.DoesNotExist:
+            return JsonResponse({'error': 'Product not found'}, status=404)
+        except Category.DoesNotExist:
+            return JsonResponse({'error': 'Category not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+@csrf_exempt
+def product_delete(request, id):
+    if request.method == 'DELETE':
+        try:
+            product = Product.objects.get(id=id)
+            product.delete()
+            return JsonResponse({'message': 'Product deleted successfully'}, status=200)
+        except Product.DoesNotExist:
+            return JsonResponse({'error': 'Product not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+            
+# Practice ORM
+def practice_orm(request):
+    # Advanced Filtering Examples
+    # Not In Query
+    res1 = Product.objects.exclude(price__in=[50, 100]).values()
+    # Not Equal
+    res2 = Product.objects.exclude(price=100).values()
+    # Greater Than
+    res3 = Product.objects.filter(price__gt=100).values()
+
+    # Range Operators
+    res1 = Product.objects.filter(price__range=[50, 100]).values()
+    # Exact Match (Case Sensitive)
+    res2 = Product.objects.filter(name__exact='Samsung Galaxy S23').values()
+    # Exact Match (Case Insensitive)
+    res3 = Product.objects.filter(name__iexact='samsung galaxy s23').values()
+    # Ends With (Case Sensitive)
+    res4 = Product.objects.filter(name__endswith='e').values()
+    # Ends With (Case Insensitive)
+    res5 = Product.objects.filter(name__iendswith='E').values()
+    # Contains (Case Sensitive)
+    res6 = Product.objects.filter(name__contains='Galaxy').values()
+    # Contains (Case Insensitive)       
+    res7 = Product.objects.filter(name__icontains='galaxy').values()
+    # Starts With (Case Sensitive)
+    res8 = Product.objects.filter(name__startswith='S').values()
+    # Starts With (Case Insensitive)
+    res9 = Product.objects.filter(name__istartswith='s').values()
+    # Regex Match (Case Sensitive)
+    res10 = Product.objects.filter(name__regex=r'^[A-Z]').values()
+    # Regex Match (Case Insensitive)    
+    res11 = Product.objects.filter(name__iregex=r'^[a-z]').values()
+    # In
+    res12 = Product.objects.filter(name__in=['Samsung Galaxy S23', 'Apple iPhone 14']).values()
+    # Is Null
+    res13 = Product.objects.filter(img_url__isnull=True).values()
+    # Is Not Null
+    res14 = Product.objects.filter(img_url__isnull=False).values()
+    # AND Condition
+    res15 = Product.objects.filter(price__gt=100, stock__lt=50).values()
+    # OR Condition
+    res16 = Product.objects.filter(Q(price__gt=100) | Q(stock__lt=50)).values()
+    # F Expressions
+    res17 = Product.objects.filter(stock__lt=F('price')).values()
+    # Exists
+    subquery = Category.objects.filter(id=OuterRef('category_id'), name__icontains='Electronics')
+    res18 = Product.objects.annotate(category_exists=Exists(subquery)).filter(category_exists=True).values()
+    # Subquery
+    subquery = Category.objects.filter(name__icontains='Electronics').values('id')
+    res18 = Product.objects.filter(category_id__in=Subquery(subquery)).values()
+    
+
+    # Contains (Case Sensitive)
+    res19 = Product.objects.filter(name__contains='ss').values()
+
+    # Contains (Case Insensitive)
+    res20 = Product.objects.filter(name__icontains='SS').values()
+
+    #Starts With (Case Sensitive)
+    res21 = Product.objects.filter(name__startswith='S').values()
+
+    #Starts With (Case Insensitive)
+    res22 = Product.objects.filter(name__istartswith='s').values()
+
     res1 = Product.objects.filter(price=100).values()
     # Not Equal
     res2 = Product.objects.exclude(price=100).values()
@@ -50,7 +230,6 @@ def home(request):
     res18 = Product.objects.filter(category_id__in=Subquery(subquery)).values()
 
     # Conditional Expressions
-   #
     return JsonResponse({
         'res1': list(res1),
         'res2': list(res2),
@@ -70,6 +249,10 @@ def home(request):
         'res16': list(res16),
         'res17': list(res17),
         'res18': list(res18),
+        'res19': list(res19),
+        'res20': list(res20),
+        'res21': list(res21),
+        'res22': list(res22),
     
     }, status=200)
                                                                               
@@ -150,8 +333,6 @@ def home(request):
     query = str(customers.query)
     return JsonResponse({'data': list(customers), 'query': query}, status=200)
     """
-
-    
 
 # about page
 def about(request):
