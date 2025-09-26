@@ -11,6 +11,20 @@ from django.core.serializers import serialize
 # home page
 def home(request):
     #return render(request, 'home.html')
+    # Session Example
+    request.session['name'] = 'Zahid Hasan'
+    request.session['email'] = 'zahidhr99@gmail.com'
+    request.session['mobile'] = '01712345678'
+
+    return JsonResponse({
+        'name': request.session.get('name'),
+        'email': request.session.get('email'),
+        'mobile': request.session.get('mobile')
+    }, status=200)
+    #return HttpResponse('Session Set Successfully', status=200) 
+
+
+    """
     res = User.objects.filter().select_related('categories').values(
         'id', 
         'username', 
@@ -27,7 +41,10 @@ def home(request):
         'categories__created_at', 
         'categories__updated_at'
     )
+    return JsonResponse({'data': list(res)}, status=200)
+    """
 
+    """
     res2 = Category.objects.filter().select_related('user').values(
         'id',
         'name',
@@ -45,8 +62,9 @@ def home(request):
         'user__last_login'
     )
     return JsonResponse({'data': list(res2)}, status=200)
+    """
 
-"""
+    """
     Product.objects.create(
         name='Samsung Galaxy S23',
         description='Latest Samsung flagship smartphone with cutting-edge features.',
@@ -58,9 +76,9 @@ def home(request):
         user_id=1   
     )
     return JsonResponse({'message': 'Home Page'}, status=200)
-"""
+    """
 
-"""
+    """
     # Insert Multiple Records
     products = [
         Product(
@@ -98,7 +116,7 @@ def home(request):
     # Add more products as needed
     Product.objects.bulk_create(products)
     return JsonResponse({'message': 'All Product inserted successfully'}, status=200)
-"""
+    """
 
 # Product Insert & Delete Operations
 @csrf_exempt
