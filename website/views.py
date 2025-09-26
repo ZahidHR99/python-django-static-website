@@ -4,14 +4,49 @@ import os
 from config import settings
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .models import OTP, Category, Product, Customer, Invoice, InvoiceProduct
+from .models import OTP, User, Category, Product, Customer, Invoice, InvoiceProduct
 from django.db.models import Q, F, Sum, Count, Avg, Max, Min, Exists, OuterRef, Subquery, When, Case, Value, CharField, DateField, DateTimeField
 from django.core.serializers import serialize
 
 # home page
 def home(request):
     #return render(request, 'home.html')
-  
+    res = User.objects.filter().select_related('categories').values(
+        'id', 
+        'username', 
+        'email', 
+        'first_name', 
+        'last_name', 
+        'is_staff', 
+        'is_active', 
+        'date_joined', 
+        'last_login', 
+        'categories__id', 
+        'categories__name', 
+        'categories__description', 
+        'categories__created_at', 
+        'categories__updated_at'
+    )
+
+    res2 = Category.objects.filter().select_related('user').values(
+        'id',
+        'name',
+        'description',
+        'created_at',
+        'updated_at',
+        'user__id',
+        'user__username',
+        'user__email',
+        'user__first_name',
+        'user__last_name',
+        'user__is_staff',
+        'user__is_active',
+        'user__date_joined',
+        'user__last_login'
+    )
+    return JsonResponse({'data': list(res2)}, status=200)
+
+"""
     Product.objects.create(
         name='Samsung Galaxy S23',
         description='Latest Samsung flagship smartphone with cutting-edge features.',
@@ -23,7 +58,7 @@ def home(request):
         user_id=1   
     )
     return JsonResponse({'message': 'Home Page'}, status=200)
-   
+"""
 
 """
     # Insert Multiple Records
