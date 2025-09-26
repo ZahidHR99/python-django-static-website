@@ -16,6 +16,19 @@ def home(request):
     request.session['email'] = 'zahidhr99@gmail.com'
     request.session['mobile'] = '01712345678'
 
+    if 'name' in request.session:
+       del request.session['name']
+       # request.session.flush() # delete all session keys
+    if 'email' in request.session:
+        del request.session['email']
+        # request.session.clear() # delete all session keys
+    if 'mobile' in request.session:
+       del request.session['mobile']
+       # request.session.clear_expired() # delete expired session keys
+
+    # Flash all session data
+    request.session.flush()
+
     return JsonResponse({
         'name': request.session.get('name'),
         'email': request.session.get('email'),
