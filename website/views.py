@@ -8,22 +8,39 @@ from .models import OTP, User, Category, Product, Customer, Invoice, InvoiceProd
 from django.db.models import Q, F, Sum, Count, Avg, Max, Min, Exists, OuterRef, Subquery, When, Case, Value, CharField, DateField, DateTimeField
 from django.core.serializers import serialize
 import logging 
+from django.core.mail import send_mail
+from django.core.mail import send_mass_mail
+from config import settings
 
 logger = logging.getLogger('custom_logger')
 
 # home page
 def home(request):
     # Logging Example
+    """
     logger.debug('This is a debug message')
     logger.info('This is an info message')
     logger.warning('This is a warning message')
     logger.error('This is an error message')
     logger.critical('This is a critical message')
+    """
 
-    # Set log with Date & Time
+    # Email Example
+    subject = 'This is a test email'
+    message = 'From Django Testing Email'
+    from_email = settings.EMAIL_HOST_USER,
+    recipient_list = ['zahidhr99@gmail.com']
 
+    send_mail(
+        subject,
+        message,
+        from_email,
+        recipient_list
+    )
 
-    return render(request, 'home.html')
+    return HttpResponse('Email sent successfully')
+
+    # return render(request, 'home.html')
 
     # Session Example
     """

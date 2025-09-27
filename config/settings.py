@@ -180,3 +180,11 @@ LOGGING = {
         },
     }
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.intelligent-soft.com'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'hello@intelligent-soft.com'
+EMAIL_HOST_PASSWORD = 'yBWi18zdcPE3'
+DEFAULT_FROM_EMAIL = 'hello@intelligent-soft.com'
