@@ -7,11 +7,26 @@ import json
 from .models import OTP, User, Category, Product, Customer, Invoice, InvoiceProduct
 from django.db.models import Q, F, Sum, Count, Avg, Max, Min, Exists, OuterRef, Subquery, When, Case, Value, CharField, DateField, DateTimeField
 from django.core.serializers import serialize
+import logging 
+
+logger = logging.getLogger('custom_logger')
 
 # home page
 def home(request):
-    #return render(request, 'home.html')
+    # Logging Example
+    logger.debug('This is a debug message')
+    logger.info('This is an info message')
+    logger.warning('This is a warning message')
+    logger.error('This is an error message')
+    logger.critical('This is a critical message')
+
+    # Set log with Date & Time
+
+
+    return render(request, 'home.html')
+
     # Session Example
+    """
     request.session['name'] = 'Zahid Hasan'
     request.session['email'] = 'zahidhr99@gmail.com'
     request.session['mobile'] = '01712345678'
@@ -29,13 +44,16 @@ def home(request):
     # Flash all session data
     request.session.flush()
 
+    # Logging
+    
+
     return JsonResponse({
         'name': request.session.get('name'),
         'email': request.session.get('email'),
         'mobile': request.session.get('mobile')
     }, status=200)
     #return HttpResponse('Session Set Successfully', status=200) 
-
+    """
 
     """
     res = User.objects.filter().select_related('categories').values(
