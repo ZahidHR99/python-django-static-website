@@ -16,6 +16,8 @@ logger = logging.getLogger('custom_logger')
 
 # home page
 def home(request):
+    return render(request, 'home.html')
+
     # Logging Example
     """
     logger.debug('This is a debug message')
@@ -47,7 +49,7 @@ def home(request):
     request.session['name'] = 'Zahid Hasan'
     request.session['email'] = 'zahidhr99@gmail.com'
     request.session['mobile'] = '01712345678'
-
+ 
     if 'name' in request.session:
        del request.session['name']
        # request.session.flush() # delete all session keys
