@@ -1,6 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Employee(models.Model):
+    name = models.CharField(max_length=100)
+    designation = models.CharField(max_length=100)
+    mobile = models.CharField(max_length=20)
+    email = models.EmailField()
+    address = models.TextField()
+    website = models.URLField()
+    salary = models.DecimalField(max_digits=10, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+
 class OTP(models.Model):
     user        = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otps')
     code        = models.CharField(max_length=6)
